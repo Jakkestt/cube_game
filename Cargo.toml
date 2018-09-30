@@ -4,6 +4,4 @@ version = "0.1.0"
 authors = ["Kranando <41551796+Kranando@users.noreply.github.com>"]
 
 [dependencies]
-piston = "0.37.0"
-piston_window = "0.70.0"
-glium = "0.22.0"
+piston_window = "0.67.0"
