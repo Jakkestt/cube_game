@@ -1,68 +1,123 @@
-extern crate piston;
-extern crate glutin_window;
-extern crate graphics;
-extern crate opengl_graphics;
+extern crate piston_window;
 
-use piston::window::WindowSettings;
-use piston::event_loop::*;
-use piston::input::*;
-use glutin_window::GlutinWindow as Window;
-use opengl_graphics::{ GlGraphics, OpenGL };
+use piston_window::*;
 
-pub struct App {
-    gl: GlGraphics,
-    rotation: f64
+pub struct Game {
+    rotation: f64,
+    x: f64,
+    y: f64,
+    up_d: bool, down_d: bool, left_d: bool, right_d: bool
 }
 
-impl App {
-    fn render(&mut self, args: &RenderArgs) {
-        use graphics::*;
+impl Game {
+    fn new() -> Game {
+        Game { rotation : 0.0, x : 0.0, y : 0.0, up_d: false, down_d: false, left_d: false, right_d: false }
+    }
+    fn on_draw(&mut self, e: Input, ren: RenderArgs, w: &mut PistonWindow) {
+        //const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
+        //const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+        const BLUE: [f32; 4] = [0.0, 0.0, 1.0, 1.0];
+        const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
-        const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-        const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
-
-        let square = rectangle::square(0.0, 0.0, 50.0);
-        let rotation = self.rotation;
-        let (x, y) = ((args.width / 2) as f64,
-                        (args.height / 2) as f64);
-
-        self.gl.draw(args.viewport(), |context, gl| {
-            clear(GREEN, gl);
-
-            let transform = context.transform.trans(x, y)
-                                                    .rot_rad(rotation)
-                                                    .trans(-25.0, -25.0);
-            rectangle(RED, square, transform, gl);
+        w.draw_2d(&e, |c, g| {
+            clear(BLUE, g);
+            let center = c.transform.trans((ren.width / 2) as f64, (ren.height / 2) as f64);
+            let square = rectangle::square(0.0, 0.0, 50.0);
+            rectangle(WHITE, square, center.trans(self.x, self.y).rot_rad(self.rotation).trans(-50.0, -50.0), g);
         });
     }
 
-    fn update(&mut self, args: &UpdateArgs) {
-        self.rotation += 2.0 * args.dt;
+    fn on_update(&mut self, upd: UpdateArgs) {
+        self.rotation += 0.0 * upd.dt;
+        if self.y >= 0.0 {
+            self.y += (10.0) * 9.0 * upd.dt;
+        }
+        if self.y <= 10.0 {
+            self.y *= (0.0) * upd.dt;
+        }
+        if self.up_d {
+            self.y += (-100.0) * upd.dt;
+        }
+        if self.down_d {
+            self.y += (100.0) * upd.dt;
+        }
+        if self.left_d {
+            self.x += (-100.0) * upd.dt;
+        }
+        if self.right_d {
+            self.x += (100.0) * upd.dt;
+        }
     }
-}
+    fn on_press(&mut self, inp: Input) {
+        match inp {
+            Input::Press(but) => {
+                match but {
+                    Button::Keyboard(Key::Up) => {
+                        self.up_d = true;
+                    }
+                    Button::Keyboard(Key::Down) => {
+                        self.down_d = true;
+                    }
+                    Button::Keyboard(Key::Left) => {
+                        self.left_d = true;
+                    }
+                    Button::Keyboard(Key::Right) => {
+                        self.right_d = true;
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        }
+    }
+
+    fn on_release(&mut self, inp: Input) {
+        match inp {
+            Input::Release(but) => {
+                match but {
+                    Button::Keyboard(Key::Up) => {
+                        self.up_d = false;
+                    }
+                    Button::Keyboard(Key::Down) => {
+                        self.down_d = false;
+                    }
+                    Button::Keyboard(Key::Left) => {
+                        self.left_d = false;
+                    }
+                    Button::Keyboard(Key::Right) => {
+                        self.right_d = false;
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        }
+    }
+ }
 
 fn main() {
-    let opengl = OpenGL::V3_2;
-
-    let mut window: Window =
+    let mut window: PistonWindow =
         WindowSettings::new("Cube", [1280, 720])
         .exit_on_esc(true)
         .build()
         .unwrap();
 
-        let mut app = App {
-            gl: GlGraphics::new(opengl),
-            rotation: 0.0
-        };
-
-    let mut events = Events::new(EventSettings::new());
-    while let Some(event) = events.next(&mut window) {
-        if let Some(render) = event.render_args() {
-            app.render(&render);
-        }
-
-        if let Some(u) = event.update_args() {
-            app.update(&u);
-        }
-    };
+    let mut game = Game::new();
+    while let Some(e) = window.next() {
+       match e {
+           Input::Render(r) => {
+               game.on_draw(e, r, &mut window);
+           }
+           Input::Update(u) => {
+               game.on_update(u);
+           }
+           Input::Press(_) => {
+               game.on_press(e);
+           }
+           Input::Release(_) => {
+               game.on_release(e);
+           }
+           _ => {}
+       }
+   }
 }
