@@ -7,3 +7,6 @@ authors = ["Kranando <41551796+Kranando@users.noreply.github.com>"]
 piston = "0.37.0"
 piston_window = "0.70.0"
 glium = "0.22.0"
+piston2d-opengl_graphics = "0.53.0"
+piston2d-graphics = "0.26.0"
+pistoncore-glutin_window = "0.47.0"
