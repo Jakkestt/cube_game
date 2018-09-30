@@ -4,7 +4,6 @@ use piston_window::*;
 
 pub struct Game {
     rotation: f64,
-    radius: f64,
     x: f64,
     y: f64,
     up_d: bool, down_d: bool, left_d: bool, right_d: bool
@@ -24,7 +23,7 @@ impl Game {
             clear(BLUE, g);
             let center = c.transform.trans((ren.width / 2) as f64, (ren.height / 2) as f64);
             let square = rectangle::square(0.0, 0.0, 100.0);
-            rectangle(WHITE, square, center.trans(self.x, self.y).rot_rad(self.rotation).radius(self.size).trans(-50.0, -50.0), g);
+            rectangle(WHITE, square, center.trans(self.x, self.y).rot_rad(self.rotation).trans(-50.0, -50.0), g);
         });
     }
 
@@ -33,7 +32,7 @@ impl Game {
         if self.y >= 0.0 {
             self.y += (10.0) * 9.0 * upd.dt;
         }
-        if self.y <= self.size {
+        if self.y <= 10.0 {
             self.y *= (0.0) * upd.dt;
         }
         if self.up_d {
