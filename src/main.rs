@@ -9,6 +9,8 @@ pub struct Game {
     up_d: bool, down_d: bool, left_d: bool, right_d: bool
 }
 
+
+
 impl Game {
     fn new() -> Game {
         Game { rotation : 0.0, x : 0.0, y : 0.0, up_d: false, down_d: false, left_d: false, right_d: false }
@@ -18,21 +20,23 @@ impl Game {
         //const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
         const BLUE: [f32; 4] = [0.0, 0.0, 1.0, 1.0];
         const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
+        let size = 100.0;
 
         w.draw_2d(&e, |c, g| {
-            clear(BLUE, g);
+            clear(WHITE, g);
             let center = c.transform.trans((ren.width / 2) as f64, (ren.height / 2) as f64);
-            let square = rectangle::square(0.0, 0.0, 100.0);
-            rectangle(WHITE, square, center.trans(self.x, self.y).rot_rad(self.rotation).trans(-50.0, -50.0), g);
+            let height =  
+            let square = rectangle::square(0.0, 0.0, size);
+            rectangle(BLUE, square, center.trans(self.x, self.y).rot_rad(self.rotation).trans(-50.0, -50.0), g);
         });
     }
 
     fn on_update(&mut self, upd: UpdateArgs) {
         self.rotation += 0.0 * upd.dt;
-        if self.y >= 0.0 {
+        if self.y >= ren.height {
             self.y += (10.0) * 9.0 * upd.dt;
         }
-        if self.y <= 10.0 {
+        if 100.0 / 2.0 + self.y <= 0.0 {
             self.y *= (0.0) * upd.dt;
         }
         if self.up_d {
