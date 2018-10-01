@@ -6,3 +6,8 @@ authors = ["Kranando <41551796+Kranando@users.noreply.github.com>"]
 [dependencies]
 piston_window = "0.67.0"
 ncollide = "0.14.1"
+find_folder = "*"
+
+[dependencies.gfx_text]
+version = "*"
+default-features = false

@@ -1,8 +1,12 @@
 extern crate piston_window;
+extern crate gfx_text;
+extern crate find_folder;
 
 use piston_window::*;
 
 pub struct Game {
+    width: f64,
+    height: f64,
     rotation: f64,
     x: f64,
     y: f64,
@@ -13,7 +17,7 @@ pub struct Game {
 
 impl Game {
     fn new() -> Game {
-        Game { rotation : 0.0, x : 0.0, y : 0.0, up_d: false, down_d: false, left_d: false, right_d: false }
+        Game { rotation : 0.0, x : 0.0, y : 0.0, width : 1280.0, height : 720.0, up_d: false, down_d: false, left_d: false, right_d: false }
     }
     fn on_draw(&mut self, e: Input, ren: RenderArgs, w: &mut PistonWindow) {
         //const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
@@ -27,15 +31,21 @@ impl Game {
             let center = c.transform.trans((ren.width / 2) as f64, (ren.height / 2) as f64);
             let square = rectangle::square(0.0, 0.0, size);
             rectangle(BLUE, square, center.trans(self.x, self.y).rot_rad(self.rotation).trans(-50.0, -50.0), g);
+            text::Text::new_color([0.0, 0.0, 0.0, 1.0], 32).draw(
+                piston_window,
+                &mut glyphs,
+                &c.draw_state,
+                transform, g
+            );
         });
     }
 
     fn on_update(&mut self, upd: UpdateArgs) {
         self.rotation += 0.0 * upd.dt;
-        if self.y >= 0.0 {
+        if self.y <= self.height {
             self.y += (10.0) * 9.0 * upd.dt;
         }
-        if 100.0 / 2.0 + self.y <= 0.0 {
+        if self.y >= self.height {
             self.y *= (0.0) * upd.dt;
         }
         if self.up_d {
@@ -101,9 +111,16 @@ impl Game {
 fn main() {
     let mut window: PistonWindow =
         WindowSettings::new("Cube", [1280, 720])
+        .fullscreen(false)
         .exit_on_esc(true)
         .build()
         .unwrap();
+
+    let assets = find_folder::Search::ParentsThenKids(3, 3)
+        .for_folder("assets").unwrap();
+    let ref font = assets.join("FiraSans-Regular.ttf");
+    let factory = window.factory.clone();
+    let mut glyphs = Glyphs::new(font, factory).unwrap();
 
     let mut game = Game::new();
     while let Some(e) = window.next() {
