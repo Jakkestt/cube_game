@@ -25,7 +25,6 @@ impl Game {
         w.draw_2d(&e, |c, g| {
             clear(WHITE, g);
             let center = c.transform.trans((ren.width / 2) as f64, (ren.height / 2) as f64);
-            let height =  
             let square = rectangle::square(0.0, 0.0, size);
             rectangle(BLUE, square, center.trans(self.x, self.y).rot_rad(self.rotation).trans(-50.0, -50.0), g);
         });
@@ -33,7 +32,7 @@ impl Game {
 
     fn on_update(&mut self, upd: UpdateArgs) {
         self.rotation += 0.0 * upd.dt;
-        if self.y >= ren.height {
+        if self.y >= 0.0 {
             self.y += (10.0) * 9.0 * upd.dt;
         }
         if 100.0 / 2.0 + self.y <= 0.0 {
